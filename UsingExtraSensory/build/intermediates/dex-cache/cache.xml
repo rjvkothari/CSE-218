@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<items version="2" >
+
+    <item
+        is-multidex="true"
+        jar="/Users/shaidams/.android/build-cache/ddd972773a5c93df5b911d3c2fc5bef301e1392b/output/jars/libs/internal_impl-22.2.1.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.0"
+        sha1="c471eaaba13ff64f6e0383d1c30a9cdc9a97efeb">
+        <dex dex="/Users/shaidams/Desktop/Fall2017/CSE218/UsingExtraSensoryLabels/app/build/intermediates/transforms/dex/debug/folders/1000/10/internal_impl-22.2.1_4b2202ea1df98a3c86f330e712ea8cf604d43c0f/classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="/Users/shaidams/.android/build-cache/07af9e1cb4153a79eaaa917013f941506e7c4cef/output/jars/classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.0"
+        sha1="1821601ddbec5ff125653097812823388700af74">
+        <dex dex="/Users/shaidams/Desktop/Fall2017/CSE218/UsingExtraSensoryLabels/app/build/intermediates/transforms/dex/debug/folders/1000/10/classes_7ceff5ee567432c5551181487a3202532c440291/classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="/Users/shaidams/Desktop/Fall2017/CSE218/UsingExtraSensoryLabels/app/build/intermediates/incremental-classes/debug/instant-run-bootstrap.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.0"
+        sha1="a1d5fbae240e83cce6275e1932aed40e130462a4">
+        <dex dex="/Users/shaidams/Desktop/Fall2017/CSE218/UsingExtraSensoryLabels/app/build/intermediates/transforms/dex/debug/folders/1000/10000/instant-run-bootstrap_5e49f7306aeea72d2dfb83b09cdff977e09057f4/classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="/Users/shaidams/.android/build-cache/79811da509eda1da98180b8b03ba332074191285/output/jars/classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.0"
+        sha1="4486e953d1f35f8ccab098b1dd67146366d5f731">
+        <dex dex="/Users/shaidams/Desktop/Fall2017/CSE218/UsingExtraSensoryLabels/app/build/intermediates/transforms/dex/debug/folders/1000/10/classes_db2bb196d17be31d4ae18ffc054a0e022b34e3a3/classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="/Users/shaidams/.android/build-cache/ddd972773a5c93df5b911d3c2fc5bef301e1392b/output/jars/classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.0"
+        sha1="f8efd0096475e0daf054267b61544e10dc776503">
+        <dex dex="/Users/shaidams/Desktop/Fall2017/CSE218/UsingExtraSensoryLabels/app/build/intermediates/transforms/dex/debug/folders/1000/10/classes_5592f0b55efb6a24c423ccd745f53d7061891500/classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="/Users/shaidams/Library/Android/sdk/extras/android/m2repository/com/android/support/support-annotations/22.2.1/support-annotations-22.2.1.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.0"
+        sha1="61a0ff5c29295ec56d7e0bd3d25d95dbf71b4b2b">
+        <dex dex="/Users/shaidams/Desktop/Fall2017/CSE218/UsingExtraSensoryLabels/app/build/intermediates/transforms/dex/debug/folders/1000/10/support-annotations-22.2.1_9f6883d2f5243f40697f789a0eded7cf4af22a83/classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="/Users/shaidams/Desktop/Fall2017/CSE218/UsingExtraSensoryLabels/app/build/intermediates/incremental-runtime-classes/debug/instant-run.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.0"
+        sha1="3be78ebc2706b2e1fe2f12d5726887a92d6c183b">
+        <dex dex="/Users/shaidams/Desktop/Fall2017/CSE218/UsingExtraSensoryLabels/app/build/intermediates/transforms/dex/debug/folders/1000/10000/instant-run_3499ac6f1af6ef24bca8308a976d44a11106b63f/classes.dex" />
+    </item>
+
+</items>
