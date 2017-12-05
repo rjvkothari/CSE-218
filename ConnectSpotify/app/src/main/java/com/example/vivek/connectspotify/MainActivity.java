@@ -17,6 +17,18 @@ import com.spotify.sdk.android.player.Player;
 import com.spotify.sdk.android.player.PlayerEvent;
 import com.spotify.sdk.android.player.Spotify;
 import com.spotify.sdk.android.player.SpotifyPlayer;
+import com.wrapper.spotify.Api;
+import com.wrapper.spotify.methods.AlbumRequest;
+import com.wrapper.spotify.models.Album;
+
+import java.util.List;
+
+import kaaes.spotify.webapi.android.SpotifyApi;
+import kaaes.spotify.webapi.android.SpotifyService;
+import kaaes.spotify.webapi.android.models.PlaylistsPager;
+import retrofit.Callback;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
 
 public class MainActivity extends Activity implements
         SpotifyPlayer.NotificationCallback, ConnectionStateCallback
@@ -28,6 +40,10 @@ public class MainActivity extends Activity implements
     private static final String REDIRECT_URI = "connectspotify://callback";
 
     private Player mPlayer;
+
+    private Api api;
+
+    private SpotifyApi spotifyApi;
 
     // Request code that will be used to verify if the result comes from correct activity
     // Can be any integer
@@ -55,6 +71,9 @@ public class MainActivity extends Activity implements
         if (requestCode == REQUEST_CODE) {
             AuthenticationResponse response = AuthenticationClient.getResponse(resultCode, intent);
             if (response.getType() == AuthenticationResponse.Type.TOKEN) {
+                //api = Api.builder().clientId(CLIENT_ID).redirectURI(REDIRECT_URI).accessToken(response.getAccessToken()).build();
+                spotifyApi = new SpotifyApi();
+                spotifyApi.setAccessToken(response.getAccessToken());
                 Config playerConfig = new Config(this, response.getAccessToken(), CLIENT_ID);
                 Spotify.getPlayer(playerConfig, this, new SpotifyPlayer.InitializationObserver() {
                     @Override
@@ -102,8 +121,52 @@ public class MainActivity extends Activity implements
     @Override
     public void onLoggedIn() {
         Log.d("MainActivity", "User logged in");
+/*
+        // Create an API instance. The default instance connects to https://api.spotify.com/.
+        Api api = Api.DEFAULT_API;
 
-        mPlayer.playUri(null, "spotify:track:2TpxZ7JUBn3uw46aR7qd6V", 0, 0);
+// Create a request object for the type of request you want to make
+        AlbumRequest request = api.getAlbum("4aawyAB9vmqN3uQ7FjRGTy").build();
+
+// Retrieve an album
+        try {
+            Album album = request.get();
+
+            mPlayer.playUri(null, album.getUri(), 0, 0);
+
+        } catch (Exception e) {
+            System.out.println("Could not get albums.");
+        }
+*/
+        //mPlayer.playUri(null, "spotify:track:2TpxZ7JUBn3uw46aR7qd6V", 0, 0);
+        //mPlayer.playUri(null, "spotify:user:canteroigor:playlist:7lrRGLQquR5hKbwPAiN8ov", 0, 0);
+
+        SpotifyService spotifyService = spotifyApi.getService();
+        //spotifyService.getAlbum();
+        spotifyService.searchPlaylists("hype", new Callback<PlaylistsPager>() {
+            @Override
+            public void success(PlaylistsPager playlistsPager, Response response) {
+                mPlayer.playUri(null, playlistsPager.playlists.items.get(1).uri, 0, 0);
+                System.out.println("output:" + playlistsPager.playlists.items.get(1).uri);
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                Log.d("failed to get query", error.toString());
+            }
+        });
+        /*spotifyService.getAlbum("2dIGnmEIy1WZIcZCFSj6i8", new Callback<kaaes.spotify.webapi.android.models.Album>() {
+            @Override
+            public void success(kaaes.spotify.webapi.android.models.Album album, Response response) {
+                Log.d("Album success", album.name);
+                mPlayer.playUri(null, album.uri, 0, 0);
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                Log.d("Album failure", error.toString());
+            }
+        }); */
     }
 
     @Override
