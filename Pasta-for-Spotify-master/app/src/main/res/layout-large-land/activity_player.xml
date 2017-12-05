@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ooo.oxo.library.widget.PullBackLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/puller"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="?android:colorBackground">
+
+        <pasta.streamer.views.CustomImageView
+            android:id="@+id/backgroundImage"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            android:src="@drawable/image_gradient" />
+
+        <android.support.design.widget.CoordinatorLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="128dp"
+            android:layout_marginRight="128dp">
+
+            <android.support.design.widget.AppBarLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@android:color/transparent">
+
+                <android.support.design.widget.CollapsingToolbarLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="128dp"
+                    app:layout_scrollFlags="scroll|exitUntilCollapsed"
+                    app:titleEnabled="false">
+
+                    <LinearLayout
+                        android:id="@+id/bg"
+                        android:layout_width="match_parent"
+                        android:layout_height="396dp"
+                        android:background="@color/colorPrimary"
+                        android:fitsSystemWindows="true"
+                        android:orientation="horizontal">
+
+                        <FrameLayout
+                            android:id="@+id/frame"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent">
+
+                            <pasta.streamer.views.SecondSquareImageView
+                                android:id="@+id/trackImage"
+                                android:layout_width="wrap_content"
+                                android:layout_height="match_parent"
+                                android:layout_gravity="center_vertical|top"
+                                android:background="#fafafa"
+                                android:scaleType="centerCrop"
+                                android:transitionName="image"
+                                app:srcCompat="@drawable/preload" />
+
+                            <ProgressBar
+                                android:id="@+id/progressBar"
+                                style="?android:attr/progressBarStyle"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center" />
+                        </FrameLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:orientation="vertical">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="0dp"
+                                android:layout_weight="1"
+                                android:gravity="center_vertical"
+                                android:orientation="vertical"
+                                android:padding="16dp">
+
+                                <TextView
+                                    android:id="@+id/title"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_margin="4dp"
+                                    android:ellipsize="end"
+                                    android:lines="1"
+                                    android:maxLines="1"
+                                    android:singleLine="true"
+                                    android:textColor="?android:textColorPrimary"
+                                    android:textSize="40sp" />
+
+                                <TextView
+                                    android:id="@+id/subtitle2"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_margin="4dp"
+                                    android:ellipsize="end"
+                                    android:lines="1"
+                                    android:maxLines="1"
+                                    android:singleLine="true"
+                                    android:textColor="?android:textColorSecondary"
+                                    android:textSize="24sp" />
+
+                                <TextView
+                                    android:id="@+id/subtitle"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_margin="4dp"
+                                    android:ellipsize="end"
+                                    android:lines="1"
+                                    android:maxLines="1"
+                                    android:singleLine="true"
+                                    android:textColor="?android:textColorSecondary"
+                                    android:textSize="24sp" />
+
+                            </LinearLayout>
+
+                            <android.support.v7.widget.AppCompatSeekBar
+                                android:id="@+id/seekBar"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center_vertical"
+                                android:layout_margin="8dp"
+                                android:progressTint="?android:textColorSecondary"
+                                android:thumbTint="?android:textColorPrimary"
+                                app:theme="@style/Widget.AppCompat.SeekBar" />
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="32dp"
+                                android:layout_gravity="bottom"
+                                android:orientation="horizontal"
+                                android:paddingLeft="16dp"
+                                android:paddingRight="16dp">
+
+                                <TextView
+                                    android:id="@+id/currentDuration"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="center_vertical"
+                                    android:layout_margin="4dp"
+                                    android:gravity="end"
+                                    android:text="00:00"
+                                    android:textColor="?android:textColorSecondary"
+                                    android:textSize="16dp" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="center_vertical"
+                                    android:layout_margin="4dp"
+                                    android:gravity="end"
+                                    android:text="/"
+                                    android:textColor="?android:textColorSecondary"
+                                    android:textSize="16dp" />
+
+                                <TextView
+                                    android:id="@+id/finalDuration"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="center_vertical"
+                                    android:layout_margin="4dp"
+                                    android:gravity="start"
+                                    android:text="00:00"
+                                    android:textColor="?android:textColorSecondary"
+                                    android:textSize="16dp" />
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="128dp"
+                                android:gravity="center_horizontal"
+                                android:orientation="horizontal">
+
+                                <pasta.streamer.views.CustomImageView
+                                    android:id="@+id/prevButton"
+                                    android:layout_width="0dp"
+                                    android:layout_height="36dp"
+                                    android:layout_gravity="center_vertical"
+                                    android:layout_marginEnd="8dp"
+                                    android:layout_marginLeft="32dp"
+                                    android:layout_marginRight="8dp"
+                                    android:layout_marginStart="32dp"
+                                    android:layout_weight="1"
+                                    android:background="?attr/selectableItemBackgroundBorderless"
+                                    android:scaleType="fitCenter"
+                                    android:tint="?android:textColorSecondary"
+                                    android:tintMode="src_in"
+                                    app:srcCompat="@drawable/ic_prev" />
+
+                                <pasta.streamer.views.CustomImageView
+                                    android:id="@+id/playButton"
+                                    android:layout_width="0dp"
+                                    android:layout_height="36dp"
+                                    android:layout_gravity="center"
+                                    android:layout_weight="1"
+                                    android:background="?attr/selectableItemBackgroundBorderless"
+                                    android:scaleType="fitCenter"
+                                    android:tint="?android:textColorPrimary"
+                                    android:tintMode="src_in"
+                                    app:srcCompat="@drawable/ic_play" />
+
+                                <pasta.streamer.views.CustomImageView
+                                    android:id="@+id/nextButton"
+                                    android:layout_width="0dp"
+                                    android:layout_height="36dp"
+                                    android:layout_gravity="center_vertical"
+                                    android:layout_marginEnd="32dp"
+                                    android:layout_marginLeft="8dp"
+                                    android:layout_marginRight="32dp"
+                                    android:layout_marginStart="8dp"
+                                    android:layout_weight="1"
+                                    android:background="?attr/selectableItemBackgroundBorderless"
+                                    android:scaleType="fitCenter"
+                                    android:tint="?android:textColorSecondary"
+                                    android:tintMode="src_in"
+                                    app:srcCompat="@drawable/ic_next" />
+                            </LinearLayout>
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                </android.support.design.widget.CollapsingToolbarLayout>
+
+            </android.support.design.widget.AppBarLayout>
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/rv"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?android:colorBackground"
+                android:clipToPadding="false"
+                android:padding="4dp"
+                android:scrollbars="vertical"
+                app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+
+        </android.support.design.widget.CoordinatorLayout>
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:layout_gravity="top"
+            android:background="@drawable/image_gradient"
+            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+            app:layout_collapseMode="pin" />
+
+    </FrameLayout>
+
+</ooo.oxo.library.widget.PullBackLayout>
