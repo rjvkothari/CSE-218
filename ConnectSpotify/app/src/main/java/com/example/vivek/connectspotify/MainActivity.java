@@ -1,5 +1,7 @@
 package com.example.vivek.connectspotify;
 
+import android.net.Uri;
+import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.app.Activity;
@@ -146,7 +148,11 @@ public class MainActivity extends Activity implements
         spotifyService.searchPlaylists("hype", new Callback<PlaylistsPager>() {
             @Override
             public void success(PlaylistsPager playlistsPager, Response response) {
-                mPlayer.playUri(null, playlistsPager.playlists.items.get(1).uri, 0, 0);
+                //mPlayer.playUri(null, playlistsPager.playlists.items.get(1).uri, 0, 0);
+                Intent intent = new Intent(MediaStore.INTENT_ACTION_MEDIA_PLAY_FROM_SEARCH);
+                intent.setData(Uri.parse(playlistsPager.playlists.items.get(1).uri));
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
                 System.out.println("output:" + playlistsPager.playlists.items.get(1).uri);
             }
 
