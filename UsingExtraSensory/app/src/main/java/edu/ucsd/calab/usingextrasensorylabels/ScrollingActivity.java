@@ -43,12 +43,18 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.PriorityQueue;
+import java.util.Queue;
+import java.util.LinkedList;
+
 import java.util.Random;
 import java.util.SortedSet;
 import java.util.StringTokenizer;
 import java.util.TreeSet;
+import java.util.Arrays;
 
 public class ScrollingActivity extends AppCompatActivity {
 
@@ -65,6 +71,7 @@ public class ScrollingActivity extends AppCompatActivity {
                 Log.d(LOG_TAG,"Caught broadcast for new timestamp: " + newTimestamp);
                 _timestamp = newTimestamp;
                 presentContent();
+
             }
         }
     };
@@ -73,7 +80,7 @@ public class ScrollingActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         presentContent();
-        //getContextChange();
+        getContextChange();
     }
 
     @Override
@@ -95,8 +102,38 @@ public class ScrollingActivity extends AppCompatActivity {
     private static final String NO_USER = "no user";
     private static final String NO_TIMESTAMP = "no timestamp";
     //Shaida
-    private String _mostProbLabel = null;
-    private String _mostProbLabel_prev = null;
+    private String _mostProbLabel_act = null;
+    private String _mostProbLabel_prev_act = null;
+
+    private String _mostProbLabel_loc = null;
+    private String _mostProbLabel_prev_loc = null;
+
+    private double maxP = 0;
+    private String maxLabel = null;
+
+    private double maxP_prev = 0;
+    private String maxLabel_prev = null;
+
+    private Queue<Pair<String,Double>> mostProbableHist = new LinkedList<Pair<String,Double>>();
+
+    private static String [] activities = {
+            "Lying down", "Sitting","Walking","Running","Bicycling","Sleeping","Lab work"
+            ,"Drive - I'm the driver","Drive - I'm a passenger","Exercise","Cooking","Shopping",
+            "Strolling","Drinking (alcohol)","Bathing - shower","Cleaning","Doing laundry",
+            "Washing dishes","Watching TV","Surfing the internet","Singing","Talking",
+            "Computer work","Eating","Grooming","Dressing","Stairs - going up","Stairs - going down",
+            "Elevator","Standing",
+    };
+
+
+    private String [] locs = {"In class","In a meeting","At work","Indoors","Outside","In a car",
+                                "On a bus","At home","At a restaurant","At a party","At a bar",
+                                "At the beach","Toilet", "At the gym", "At school",
+                                "With co-workers","With friends" };
+
+    HashSet<String> activity_set = new HashSet<String >(Arrays.asList(activities));
+    HashSet<String> loc_set = new HashSet<String >(Arrays.asList(locs));
+
 
 
     private boolean fillUserSelector() {
@@ -169,9 +206,13 @@ public class ScrollingActivity extends AppCompatActivity {
     private void presentContent() {
         setContentView(R.layout.activity_scrolling);
 
+
         fillUserSelector();
+
         fillTimestampSelector();
+
         presentSepcificTimestampContent();
+
         highestProbLabel();
 
     }
@@ -186,6 +227,11 @@ public class ScrollingActivity extends AppCompatActivity {
         String textToPresent;
         if (_uuidPrefix == null || _uuidPrefix == NO_USER) {
             textToPresent = "There is no ExtraSensory user on this phone.";
+
+            Toast.makeText(getApplicationContext()," 1st if cases inside present " + _uuidPrefix ,
+                    Toast.LENGTH_SHORT).show();
+
+
         }
         else if (_timestamp == null || _timestamp == NO_TIMESTAMP) {
             textToPresent = "User with UUID prefix " + _uuidPrefix + " has no saved recognition files.";
@@ -240,27 +286,82 @@ public class ScrollingActivity extends AppCompatActivity {
       method for outputting the label with the highest probability for the current timeStamp for this user
      */
     private void highestProbLabel(){
+
+        Toast.makeText(getApplicationContext(),"inside highest probable" ,
+                Toast.LENGTH_SHORT).show();
+
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         CollapsingToolbarLayout toolBarLayout = (CollapsingToolbarLayout) findViewById(R.id.toolbar_layout);
         toolBarLayout.setTitle(getTitle());
 
+
         String textToPresent;
 
         if (_uuidPrefix == null || _uuidPrefix == NO_USER) {
             textToPresent = "There is no ExtraSensory user on this phone.";
+
+
+            Toast.makeText(getApplicationContext()," 1st if cases " + _uuidPrefix ,
+                    Toast.LENGTH_SHORT).show();
         }
         else if (_timestamp == null || _timestamp == NO_TIMESTAMP) {
             textToPresent = "User with UUID prefix " + _uuidPrefix + " has no saved recognition files.";
+
+            Toast.makeText(getApplicationContext()," else if cases" ,
+                    Toast.LENGTH_SHORT).show();
         }
         else {
+
+            Toast.makeText(getApplicationContext(),"inside else stmt" ,
+                    Toast.LENGTH_SHORT).show();
+
             String fileContent = readESALabelsFileForMinute(_uuidPrefix, _timestamp, true);
             PriorityQueue<Pair<String, Double>> labelsAndProbs = parseServerPredictionLabelProbabilities(fileContent);
 
-            _mostProbLabel_prev = _mostProbLabel;
-            _mostProbLabel= labelsAndProbs.peek().first;
-            Toast.makeText(getApplicationContext(),_mostProbLabel,
-                    Toast.LENGTH_SHORT).show();
+            _mostProbLabel_prev_act = _mostProbLabel_act;
+            _mostProbLabel_prev_loc = _mostProbLabel_loc;
+
+            boolean found_act = false;
+            boolean found_loc = false;
+            double p_loc = 0;
+            double p_act = 0;
+            while(!found_act || !found_loc){
+                Toast.makeText(getApplicationContext(),"inside while loop for finding loc and act" ,
+                        Toast.LENGTH_SHORT).show();
+
+                String top= labelsAndProbs.poll().first;
+                double p =labelsAndProbs.poll().second;
+
+                if(activity_set.contains(top)){
+                    _mostProbLabel_act = top;
+                    p_loc = p;
+                    found_act = true;
+                }
+                else{
+                    _mostProbLabel_loc = top;
+                    p_act = p;
+                    found_loc = true;
+                }
+
+            }
+            // populating most probale history queue
+            Pair<String, Double> pair = new Pair<String, Double>(_mostProbLabel_act+ " "+_mostProbLabel_loc, p_loc+ p_act );
+            if(mostProbableHist.size() <5){
+                mostProbableHist.add(pair);
+            }
+            else{
+                mostProbableHist.poll();
+                mostProbableHist.add(pair);
+            }
+
+            //System.out.println(_mostProbLabel_act);
+            //_mostProbLabel= labelsAndProbs.peek().first;
+            Toast.makeText(getApplicationContext(),"You are doing "+_mostProbLabel_act + " while you are " + _mostProbLabel_loc,
+                    Toast.LENGTH_LONG).show();
+
+
 
         }
 
@@ -278,12 +379,12 @@ public class ScrollingActivity extends AppCompatActivity {
             @Override
             public void handleMessage(Message msg) {
                 //Location l = (Location) msg.obj;
-                Toast.makeText(getApplicationContext(),"made change",
+                Toast.makeText(getApplicationContext(),"made change: "+ maxLabel ,
                        Toast.LENGTH_SHORT).show();
-
 
             }
         };
+
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -297,7 +398,23 @@ public class ScrollingActivity extends AppCompatActivity {
                                 //Location l = BasicReceiver.fieldLocation;
                                 //_mostProbLabel_prev = "ddd";
                                 //_mostProbLabel = "abs"+ Math.random();
-                                if( _mostProbLabel_prev != _mostProbLabel){
+                                //maxP_prev = maxP;
+                                maxLabel_prev = maxLabel;
+
+                                if(mostProbableHist.size() == 5){
+                                     maxP = 0;
+                                     maxLabel = null;
+                                    for(Pair<String, Double> item : mostProbableHist){
+                                        if(item.second > maxP) {
+                                            maxP = item.second;
+                                            maxLabel = item.first;
+                                        }
+                                    }
+
+                                }
+
+
+                                if( maxLabel_prev != maxLabel){
                                     Message msg = new Message();
                                     //msg.obj = l;
                                     mHandler.sendMessage(msg);
@@ -474,6 +591,7 @@ public class ScrollingActivity extends AppCompatActivity {
         try {
             JSONObject jsonObject = new JSONObject(predictionFileContent);
             JSONArray labelArray = jsonObject.getJSONArray(JSON_FIELD_LABEL_NAMES);
+            Log.d("labless",labelArray.toString());
             JSONArray probArray = jsonObject.getJSONArray(JSON_FIELD_LABEL_PROBABILITIES);
             // Make sure both arrays have the same size:
             if (labelArray == null || probArray == null || labelArray.length() != probArray.length()) {
