@@ -153,7 +153,7 @@ public class MainActivity extends Activity implements
         AuthenticationRequest request = builder.build();
 
         AuthenticationClient.openLoginActivity(this, REQUEST_CODE, request);
-
+        chooseMusic();
         getContextChange();
     }
 
@@ -259,32 +259,41 @@ public class MainActivity extends Activity implements
             uuidPrefixes.add(NO_USER);
             haveUsers = false;
         }
+
+         _uuidPrefix = uuidPrefixes.get(0);
         boolean haveTimestamps = true;
         List<String> timestamps = getTimestampsForUser(_uuidPrefix);
+         _timestamp = timestamps.get(0);
+
         // check if the user has any timestamps at all:
         if ((timestamps == null) || (timestamps.isEmpty())) {
             timestamps = new ArrayList<>();
             timestamps.add(NO_TIMESTAMP);
             haveTimestamps = false;
         }
-        String uuidPrefix = uuidPrefixes.get(0);
-        String timestamp = timestamps.get(0);
-        if (uuidPrefix == null || uuidPrefix == NO_USER) {
-            String textToPresent = "There is no ExtraSensory user on this phone.";
+
+
+        String textToPresent;
+
+        if (_uuidPrefix == null || _uuidPrefix == NO_USER) {
+            textToPresent = "There is no ExtraSensory user on this phone.";
 
 
             Toast.makeText(getApplicationContext()," 1st if cases " + _uuidPrefix ,
                     Toast.LENGTH_SHORT).show();
-        } else if (timestamp == null || timestamp == NO_TIMESTAMP) {
-            String textToPresent = "User with UUID prefix " + _uuidPrefix + " has no saved recognition files.";
+        }
+        else if (_timestamp == null || _timestamp == NO_TIMESTAMP) {
+            textToPresent = "User with UUID prefix " + _uuidPrefix + " has no saved recognition files.";
 
             Toast.makeText(getApplicationContext()," else if cases" ,
                     Toast.LENGTH_SHORT).show();
-        } else {
+        }
+        else {
+
             Toast.makeText(getApplicationContext(),"inside else stmt" ,
                     Toast.LENGTH_SHORT).show();
 
-            String fileContent = readESALabelsFileForMinute(uuidPrefix, timestamp, true);
+            String fileContent = readESALabelsFileForMinute(_uuidPrefix, _timestamp, true);
             PriorityQueue<Pair<String, Double>> labelsAndProbs = parseServerPredictionLabelProbabilities(fileContent);
 
             _mostProbLabel_prev_act = _mostProbLabel_act;
@@ -328,7 +337,15 @@ public class MainActivity extends Activity implements
             Toast.makeText(getApplicationContext(),"You are doing "+_mostProbLabel_act + " while you are " + _mostProbLabel_loc,
                     Toast.LENGTH_LONG).show();
 
+
+
         }
+
+
+
+        //TextView scrolledText = (TextView)findViewById(R.id.the_scrolled_text);
+        //scrolledText.setText(textToPresent);
+
     }
 
     Handler mHandler;
