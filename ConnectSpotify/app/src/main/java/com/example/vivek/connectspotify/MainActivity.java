@@ -153,14 +153,14 @@ public class MainActivity extends Activity implements
         AuthenticationRequest request = builder.build();
 
         AuthenticationClient.openLoginActivity(this, REQUEST_CODE, request);
-        chooseMusic();
-        getContextChange();
+        //chooseMusic();
+        //getContextChange();
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        Log.d(LOG_TAG,"registering for broadcast: " + ESA_BROADCAST_SAVED_PRED_FILE);
+        Log.d(LOG_TAG,"registring for broadcast: " + ESA_BROADCAST_SAVED_PRED_FILE);
         this.registerReceiver(_broadcastReceiver,new IntentFilter(ESA_BROADCAST_SAVED_PRED_FILE));
     }
 
@@ -181,6 +181,8 @@ public class MainActivity extends Activity implements
             if (response.getType() == AuthenticationResponse.Type.TOKEN) {
                 spotifyApi = new SpotifyApi();
                 spotifyApi.setAccessToken(response.getAccessToken());
+                chooseMusic();
+                getContextChange();
                 Config playerConfig = new Config(this, response.getAccessToken(), CLIENT_ID);
                 Spotify.getPlayer(playerConfig, this, new SpotifyPlayer.InitializationObserver() {
                     @Override
@@ -228,7 +230,7 @@ public class MainActivity extends Activity implements
     @Override
     public void onLoggedIn() {
         Log.d("MainActivity", "User logged in");
-        chooseMusic();
+        //chooseMusic();
     }
 
     @Override
@@ -355,27 +357,28 @@ public class MainActivity extends Activity implements
             @Override
             public void handleMessage(Message msg) {
                 //Location l = (Location) msg.obj;
-                Toast.makeText(getApplicationContext(),"made change: "+ maxLabel ,
+                Toast.makeText(getApplicationContext(), "made change: " + maxLabel,
                         Toast.LENGTH_SHORT).show();
+                if (maxLabel != null) {
+                    SpotifyService spotifyService = spotifyApi.getService();
+                    spotifyService.searchPlaylists(maxLabel, new retrofit.Callback<PlaylistsPager>() {
+                        @Override
+                        public void success(PlaylistsPager playlistsPager, Response response) {
+                            //mPlayer.playUri(null, playlistsPager.playlists.items.get(1).uri, 0, 0);
+                            Intent intent = new Intent(MediaStore.INTENT_ACTION_MEDIA_PLAY_FROM_SEARCH);
+                            intent.setData(Uri.parse(playlistsPager.playlists.items.get(1).uri));
+                            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            startActivity(intent);
+                            System.out.println("output:" + playlistsPager.playlists.items.get(1).uri);
+                        }
 
-                SpotifyService spotifyService = spotifyApi.getService();
-                spotifyService.searchPlaylists(maxLabel, new retrofit.Callback<PlaylistsPager>() {
-                    @Override
-                    public void success(PlaylistsPager playlistsPager, Response response) {
-                        //mPlayer.playUri(null, playlistsPager.playlists.items.get(1).uri, 0, 0);
-                        Intent intent = new Intent(MediaStore.INTENT_ACTION_MEDIA_PLAY_FROM_SEARCH);
-                        intent.setData(Uri.parse(playlistsPager.playlists.items.get(1).uri));
-                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                        startActivity(intent);
-                        System.out.println("output:" + playlistsPager.playlists.items.get(1).uri);
-                    }
+                        @Override
+                        public void failure(RetrofitError error) {
+                            Log.d("failed to get query", error.toString());
+                        }
+                    });
 
-                    @Override
-                    public void failure(RetrofitError error) {
-                        Log.d("failed to get query", error.toString());
-                    }
-                });
-
+                }
             }
         };
 
