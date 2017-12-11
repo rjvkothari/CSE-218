@@ -325,7 +325,7 @@ public class MainActivity extends Activity implements
 
             }
             // populating most probale history queue
-            Pair<String, Double> pair = new Pair<String, Double>(_mostProbLabel_act+ " "+_mostProbLabel_loc, p_loc+ p_act );
+            Pair<String, Double> pair = new Pair<String, Double>(_mostProbLabel_act+ "/"+_mostProbLabel_loc, p_loc+ p_act );
             if(mostProbableHist.size() <5){
                 mostProbableHist.add(pair);
             }
@@ -360,24 +360,8 @@ public class MainActivity extends Activity implements
                 Toast.makeText(getApplicationContext(), "made change: " + maxLabel,
                         Toast.LENGTH_SHORT).show();
                 if (maxLabel != null) {
-                    SpotifyService spotifyService = spotifyApi.getService();
-                    spotifyService.searchPlaylists(maxLabel, new retrofit.Callback<PlaylistsPager>() {
-                        @Override
-                        public void success(PlaylistsPager playlistsPager, Response response) {
-                            //mPlayer.playUri(null, playlistsPager.playlists.items.get(1).uri, 0, 0);
-                            Intent intent = new Intent(MediaStore.INTENT_ACTION_MEDIA_PLAY_FROM_SEARCH);
-                            intent.setData(Uri.parse(playlistsPager.playlists.items.get(1).uri));
-                            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                            startActivity(intent);
-                            System.out.println("output:" + playlistsPager.playlists.items.get(1).uri);
-                        }
-
-                        @Override
-                        public void failure(RetrofitError error) {
-                            Log.d("failed to get query", error.toString());
-                        }
-                    });
-
+                    String[] labels = maxLabel.split("/");
+                    playMusic1(labels[0], labels[1]);
                 }
             }
         };
@@ -424,6 +408,83 @@ public class MainActivity extends Activity implements
                 }
             }
         }).start();
+    }
+
+    private void playMusic1(String activity, String location) {
+        final String act = activity;
+        SpotifyService spotifyService = spotifyApi.getService();
+        Log.d("MainActivity", "PlayMusic1: Activity Location: " + activity + " " + location);
+        spotifyService.searchPlaylists(activity + " " + location, new retrofit.Callback<PlaylistsPager>() {
+            @Override
+            public void success(PlaylistsPager playlistsPager, Response response) {
+                //mPlayer.playUri(null, playlistsPager.playlists.items.get(1).uri, 0, 0);
+                if (playlistsPager.playlists.items.size() > 0) {
+                    Intent intent = new Intent(MediaStore.INTENT_ACTION_MEDIA_PLAY_FROM_SEARCH);
+                    intent.setData(Uri.parse(playlistsPager.playlists.items.get(1).uri));
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(intent);
+                    System.out.println("output:" + playlistsPager.playlists.items.get(1).uri);
+                } else {
+                    playMusic2(act);
+                }
+
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                Log.d("failed to get query", error.toString());
+            }
+        });
+
+    }
+
+    private void playMusic2(String activity) {
+        SpotifyService spotifyService = spotifyApi.getService();
+        Log.d("MainActivity", "PlayMusic2: Activity: " + activity);
+        spotifyService.searchPlaylists(activity, new retrofit.Callback<PlaylistsPager>() {
+            @Override
+            public void success(PlaylistsPager playlistsPager, Response response) {
+                //mPlayer.playUri(null, playlistsPager.playlists.items.get(1).uri, 0, 0);
+                if (playlistsPager.playlists.items.size() > 0) {
+                    Intent intent = new Intent(MediaStore.INTENT_ACTION_MEDIA_PLAY_FROM_SEARCH);
+                    intent.setData(Uri.parse(playlistsPager.playlists.items.get(1).uri));
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(intent);
+                    System.out.println("output:" + playlistsPager.playlists.items.get(1).uri);
+                } else {
+                    playMusic3();
+                }
+
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                Log.d("failed to get query", error.toString());
+            }
+        });
+
+    }
+
+    private void playMusic3() {
+        SpotifyService spotifyService = spotifyApi.getService();
+        Log.d("MainActivity", "PlayMusic3: default is being played");
+        spotifyService.searchPlaylists("hype", new retrofit.Callback<PlaylistsPager>() {
+            @Override
+            public void success(PlaylistsPager playlistsPager, Response response) {
+                //mPlayer.playUri(null, playlistsPager.playlists.items.get(1).uri, 0, 0);
+                Intent intent = new Intent(MediaStore.INTENT_ACTION_MEDIA_PLAY_FROM_SEARCH);
+                intent.setData(Uri.parse(playlistsPager.playlists.items.get(1).uri));
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+                System.out.println("output:" + playlistsPager.playlists.items.get(1).uri);
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                Log.d("failed to get query", error.toString());
+            }
+        });
+
     }
 
     private static final String SERVER_PREDICTIONS_FILE_SUFFIX = ".server_predictions.json";
