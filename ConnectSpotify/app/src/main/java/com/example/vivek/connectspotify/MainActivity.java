@@ -94,12 +94,13 @@ public class MainActivity extends Activity implements
     private String _mostProbLabel_prev_loc = null;
 
     private double maxP = 0;
-    private String maxLabel = null;
+    private String maxLabel = "";
 
     private double maxP_prev = 0;
-    private String maxLabel_prev = null;
+    private String maxLabel_prev = "";
 
     private Queue<Pair<String,Double>> mostProbableHist = new LinkedList<Pair<String,Double>>();
+    private int histSize = 2;
 
     private static String [] activities = {
             "Lying down", "Sitting","Walking","Running","Bicycling","Sleeping","Lab work"
@@ -166,8 +167,8 @@ public class MainActivity extends Activity implements
 
     @Override
     public void onPause() {
-        this.unregisterReceiver(_broadcastReceiver);
-        Log.d(LOG_TAG,"Unregistered broadcast: " + ESA_BROADCAST_SAVED_PRED_FILE);
+        //this.unregisterReceiver(_broadcastReceiver);
+        //Log.d(LOG_TAG,"Unregistered broadcast: " + ESA_BROADCAST_SAVED_PRED_FILE);
         super.onPause();
     }
 
@@ -265,7 +266,7 @@ public class MainActivity extends Activity implements
          _uuidPrefix = uuidPrefixes.get(0);
         boolean haveTimestamps = true;
         List<String> timestamps = getTimestampsForUser(_uuidPrefix);
-         _timestamp = timestamps.get(0);
+         //_timestamp = timestamps.get(0);
 
         // check if the user has any timestamps at all:
         if ((timestamps == null) || (timestamps.isEmpty())) {
@@ -298,8 +299,8 @@ public class MainActivity extends Activity implements
             String fileContent = readESALabelsFileForMinute(_uuidPrefix, _timestamp, true);
             PriorityQueue<Pair<String, Double>> labelsAndProbs = parseServerPredictionLabelProbabilities(fileContent);
 
-            _mostProbLabel_prev_act = _mostProbLabel_act;
-            _mostProbLabel_prev_loc = _mostProbLabel_loc;
+           // _mostProbLabel_prev_act = _mostProbLabel_act;
+           // _mostProbLabel_prev_loc = _mostProbLabel_loc;
 
             boolean found_act = false;
             boolean found_loc = false;
@@ -312,12 +313,12 @@ public class MainActivity extends Activity implements
                 String top= labelsAndProbs.poll().first;
                 double p =labelsAndProbs.poll().second;
 
-                if(activity_set.contains(top)){
+                if(activity_set.contains(top) && !found_act){
                     _mostProbLabel_act = top;
                     p_loc = p;
                     found_act = true;
                 }
-                else{
+                else if(loc_set.contains(top) && !found_loc){
                     _mostProbLabel_loc = top;
                     p_act = p;
                     found_loc = true;
@@ -326,7 +327,7 @@ public class MainActivity extends Activity implements
             }
             // populating most probale history queue
             Pair<String, Double> pair = new Pair<String, Double>(_mostProbLabel_act+ "/"+_mostProbLabel_loc, p_loc+ p_act );
-            if(mostProbableHist.size() <5){
+            if(mostProbableHist.size() <histSize){
                 mostProbableHist.add(pair);
             }
             else{
@@ -353,6 +354,7 @@ public class MainActivity extends Activity implements
     Handler mHandler;
 
     protected void getContextChange() {
+
         mHandler = new Handler() {
             @Override
             public void handleMessage(Message msg) {
@@ -371,7 +373,7 @@ public class MainActivity extends Activity implements
             public void run() {
                 while (true) {
                     try {
-                        Thread.sleep(10000);
+                        Thread.sleep(5000);
                         mHandler.post(new Runnable() {
 
                             @Override
@@ -382,7 +384,7 @@ public class MainActivity extends Activity implements
                                 //maxP_prev = maxP;
                                 maxLabel_prev = maxLabel;
 
-                                if(mostProbableHist.size() == 5){
+                                if(mostProbableHist.size() == histSize){
                                     maxP = 0;
                                     maxLabel = null;
                                     for(Pair<String, Double> item : mostProbableHist){
@@ -392,14 +394,20 @@ public class MainActivity extends Activity implements
                                         }
                                     }
 
+                                    if( !maxLabel_prev.equals(maxLabel) ){
+                                        Message msg = new Message();
+                                        //msg.obj = l;
+                                        mHandler.sendMessage(msg);
+                                    }
+
                                 }
 
 
-                                if( maxLabel_prev != maxLabel){
+                                /*if( maxLabel_prev != maxLabel){
                                     Message msg = new Message();
                                     //msg.obj = l;
                                     mHandler.sendMessage(msg);
-                                }
+                                }*/
 
                             }
                         });
