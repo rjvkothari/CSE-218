@@ -1,5 +1,6 @@
 package com.example.vivek.connectspotify;
 
+import android.app.ListActivity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.IntentFilter;
@@ -9,6 +10,7 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.app.Activity;
@@ -16,6 +18,11 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.Pair;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.spotify.sdk.android.authentication.AuthenticationClient;
@@ -31,6 +38,7 @@ import com.spotify.sdk.android.player.SpotifyPlayer;
 import com.wrapper.spotify.Api;
 import com.wrapper.spotify.methods.AlbumRequest;
 import com.wrapper.spotify.models.Album;
+import android.support.design.widget.BottomNavigationView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -48,6 +56,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Queue;
+import java.util.Random;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -58,7 +67,7 @@ import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
 
-public class MainActivity extends Activity implements
+public class MainActivity extends ListActivity implements
         SpotifyPlayer.NotificationCallback, ConnectionStateCallback
 {
 
@@ -100,7 +109,9 @@ public class MainActivity extends Activity implements
     private String maxLabel_prev = "";
 
     private Queue<Pair<String,Double>> mostProbableHist = new LinkedList<Pair<String,Double>>();
-    private int histSize = 2;
+    private int histSize = 3;
+
+    private String[] currentActivities = {"Please wait for device to figure out what you are doing..."};
 
     private static String [] activities = {
             "Lying down", "Sitting","Walking","Running","Bicycling","Sleeping","Lab work"
@@ -142,6 +153,47 @@ public class MainActivity extends Activity implements
 
     };
 
+    private TextView mTextMessage;
+    private Context c = null;
+    private ArrayAdapter adapter = null;
+    String[] stuff = {};
+
+    private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
+            = new BottomNavigationView.OnNavigationItemSelectedListener() {
+
+        @Override
+        public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+            switch (item.getItemId()) {
+                case R.id.navigation_home:
+                    stuff = currentActivities;
+                    adapter = new ArrayAdapter(c,android.R.layout.simple_list_item_1, stuff);
+                    setListAdapter(adapter);
+                    return true;
+                case R.id.navigation_dashboard:
+                    stuff = activities;
+                    adapter = new ArrayAdapter(c,android.R.layout.simple_list_item_1, stuff);
+                    setListAdapter(adapter);
+                    return true;
+            }
+            return false;
+        }
+    };
+
+    @Override
+    protected void onListItemClick(ListView l, View v, int position, long id) {
+        super.onListItemClick(l, v, position, id);
+        Object o = this.getListAdapter().getItem(position);
+        String pen = o.toString();
+        if (pen != null && !pen.equals("Please wait for device to figure out what you are doing...")) {
+            Toast.makeText(this, "Playing: " + " " + pen, Toast.LENGTH_LONG).show();
+            String[] labels = pen.split("/");
+            if (labels.length == 2)
+                playMusic1(labels[0], labels[1]);
+            else
+                playMusic2(labels[0]);
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -156,6 +208,17 @@ public class MainActivity extends Activity implements
         AuthenticationClient.openLoginActivity(this, REQUEST_CODE, request);
         //chooseMusic();
         //getContextChange();
+
+        c = this;
+        setContentView(R.layout.activity_main);
+
+        mTextMessage = (TextView) findViewById(R.id.message);
+        BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
+        navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+
+        stuff = currentActivities;
+        adapter = new ArrayAdapter(this,android.R.layout.simple_list_item_1, stuff);
+        setListAdapter(adapter);
     }
 
     @Override
@@ -339,9 +402,16 @@ public class MainActivity extends Activity implements
             //_mostProbLabel= labelsAndProbs.peek().first;
             Toast.makeText(getApplicationContext(),"You are doing "+_mostProbLabel_act + " while you are " + _mostProbLabel_loc,
                     Toast.LENGTH_LONG).show();
-
-
-
+            ArrayList<String> listOfCurrent = new ArrayList<>();
+            for (Pair<String, Double> item : mostProbableHist) {
+                listOfCurrent.add(item.first);
+            }
+            currentActivities = new String[listOfCurrent.size()];
+            for (int i = 0; i < listOfCurrent.size(); i++) {
+                currentActivities[i] = listOfCurrent.get(i);
+            }
+            adapter = new ArrayAdapter(this,android.R.layout.simple_list_item_1, currentActivities);
+            setListAdapter(adapter);
         }
 
 
@@ -373,7 +443,7 @@ public class MainActivity extends Activity implements
             public void run() {
                 while (true) {
                     try {
-                        Thread.sleep(5000);
+                        Thread.sleep(2000);
                         mHandler.post(new Runnable() {
 
                             @Override
@@ -427,11 +497,13 @@ public class MainActivity extends Activity implements
             public void success(PlaylistsPager playlistsPager, Response response) {
                 //mPlayer.playUri(null, playlistsPager.playlists.items.get(1).uri, 0, 0);
                 if (playlistsPager.playlists.items.size() > 0) {
+                    Random rn = new Random();
+                    int rando = rn.nextInt(playlistsPager.playlists.items.size() - 1) + 1;
                     Intent intent = new Intent(MediaStore.INTENT_ACTION_MEDIA_PLAY_FROM_SEARCH);
-                    intent.setData(Uri.parse(playlistsPager.playlists.items.get(1).uri));
+                    intent.setData(Uri.parse(playlistsPager.playlists.items.get(rando).uri));
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(intent);
-                    System.out.println("output:" + playlistsPager.playlists.items.get(1).uri);
+                    System.out.println("output:" + playlistsPager.playlists.items.get(rando).uri);
                 } else {
                     playMusic2(act);
                 }
@@ -454,11 +526,13 @@ public class MainActivity extends Activity implements
             public void success(PlaylistsPager playlistsPager, Response response) {
                 //mPlayer.playUri(null, playlistsPager.playlists.items.get(1).uri, 0, 0);
                 if (playlistsPager.playlists.items.size() > 0) {
+                    Random rn = new Random();
+                    int rando = rn.nextInt(playlistsPager.playlists.items.size() - 1) + 1;
                     Intent intent = new Intent(MediaStore.INTENT_ACTION_MEDIA_PLAY_FROM_SEARCH);
-                    intent.setData(Uri.parse(playlistsPager.playlists.items.get(1).uri));
+                    intent.setData(Uri.parse(playlistsPager.playlists.items.get(rando).uri));
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(intent);
-                    System.out.println("output:" + playlistsPager.playlists.items.get(1).uri);
+                    System.out.println("output:" + playlistsPager.playlists.items.get(rando).uri);
                 } else {
                     playMusic3();
                 }
@@ -479,7 +553,7 @@ public class MainActivity extends Activity implements
         spotifyService.searchPlaylists("hype", new retrofit.Callback<PlaylistsPager>() {
             @Override
             public void success(PlaylistsPager playlistsPager, Response response) {
-                //mPlayer.playUri(null, playlistsPager.playlists.items.get(1).uri, 0, 0);
+                //mPlayer.playUri(null, playlistsPager.playlists.items.get(1).uri, 0, 0);;
                 Intent intent = new Intent(MediaStore.INTENT_ACTION_MEDIA_PLAY_FROM_SEARCH);
                 intent.setData(Uri.parse(playlistsPager.playlists.items.get(1).uri));
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
