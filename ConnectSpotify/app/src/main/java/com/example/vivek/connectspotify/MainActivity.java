@@ -373,7 +373,7 @@ public class MainActivity extends Activity implements
             public void run() {
                 while (true) {
                     try {
-                        Thread.sleep(5000);
+                        Thread.sleep(1000);
                         mHandler.post(new Runnable() {
 
                             @Override
